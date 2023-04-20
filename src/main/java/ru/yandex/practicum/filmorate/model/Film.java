@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.validation.FilmRelease;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.time.LocalDate;
+
 @Data
 public class Film {
     private int id;
