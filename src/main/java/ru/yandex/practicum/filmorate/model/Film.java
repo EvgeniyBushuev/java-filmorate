@@ -10,7 +10,6 @@ import java.time.LocalDate;
 
 @Data
 public class Film {
-
     private int id;
     @NotBlank
     private String name;
