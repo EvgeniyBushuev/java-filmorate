@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+
 import javax.validation.Valid;
+
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ public class FilmController {
 
     private int id = 0;
     private Map<Integer, Film> films = new HashMap<>();
+
     @GetMapping
     public List<Film> getFilms() {
         return new ArrayList<>(films.values());
