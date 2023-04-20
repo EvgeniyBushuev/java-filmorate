@@ -21,6 +21,7 @@ public class FilmValidationTest {
         film.setDuration(189);
         return film;
     }
+
     @Test
     void shouldPassValidationWithValidFilm() {
         Film film = getNewFilm();
