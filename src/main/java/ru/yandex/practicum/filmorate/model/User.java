@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.validation.NoSpace;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+
 @Data
 @EqualsAndHashCode
 public class User {
