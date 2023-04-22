@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
-import javax.validation.ValidationException;
 import javax.validation.Validator;
 import java.time.LocalDate;
 import java.util.Set;
@@ -54,7 +53,7 @@ public class FilmValidationTest {
 
     @Test
     void shouldNotPassValidationIfDateIsLessThanFilmIndustryStarted() {
-        LocalDate FilmIndustryStart = LocalDate.of(1895, 12, 28);
+        LocalDate filmIndustryStart = LocalDate.of(1895, 12, 28);
 
         Film film = getNewFilm();
 
@@ -62,7 +61,7 @@ public class FilmValidationTest {
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertEquals(1, violations.size());
-        assertTrue(FilmIndustryStart.isAfter(film.getReleaseDate()));
+        assertTrue(filmIndustryStart.isAfter(film.getReleaseDate()));
 
     }
 }
