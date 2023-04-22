@@ -48,17 +48,21 @@ public class FilmValidationTest {
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertEquals(1, violations.size());
+        assertTrue(film.getDescription().length() > 200);
 
     }
 
     @Test
     void shouldNotPassValidationIfDateIsLessThanFilmIndustryStarted() {
+        LocalDate FilmIndustryStart = LocalDate.of(1895, 12, 28);
+
         Film film = getNewFilm();
 
         film.setReleaseDate(LocalDate.of(1895, 11, 28));
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertEquals(1, violations.size());
+        assertTrue(FilmIndustryStart.isAfter(film.getReleaseDate()));
 
     }
 }
