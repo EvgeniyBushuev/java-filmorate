@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.sun.tools.jconsole.JConsoleContext;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Validate;
 
 import javax.validation.*;
 import java.time.LocalDate;
@@ -40,7 +38,8 @@ public class FilmValidationTest {
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         List<String> errorMessage = violations.stream().
-                map(ConstraintViolation::getMessage).collect(Collectors.toList());
+                map(ConstraintViolation::getMessage)
+                .collect(Collectors.toList());
 
         assertEquals(1, violations.size());
         assertEquals("Название не может быть пустым", errorMessage.get(0));
@@ -54,7 +53,8 @@ public class FilmValidationTest {
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         List<String> errorMessage = violations.stream().
-                map(ConstraintViolation::getMessage).collect(Collectors.toList());
+                map(ConstraintViolation::getMessage)
+                .collect(Collectors.toList());
 
         assertEquals(1, violations.size());
         assertTrue(film.getDescription().length() > 200);
@@ -73,7 +73,8 @@ public class FilmValidationTest {
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
 
         List<String> errorMessage = violations.stream().
-                map(ConstraintViolation::getMessage).collect(Collectors.toList());
+                map(ConstraintViolation::getMessage)
+                .collect(Collectors.toList());
 
         assertEquals(1, violations.size());
         assertTrue(filmIndustryStart.isAfter(film.getReleaseDate()));
