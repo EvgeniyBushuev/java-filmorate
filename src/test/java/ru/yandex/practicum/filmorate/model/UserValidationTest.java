@@ -47,7 +47,7 @@ public class UserValidationTest {
     }
 
     @Test
-    void shouldNotPassValidationIfLoginIsBlancOrContainsSpaces() {
+    void shouldNotPassValidationIfLoginIsBlanc() {
         User user = getNewUser();
         user.setLogin("");
 
@@ -59,14 +59,20 @@ public class UserValidationTest {
         assertEquals(1, violations.size());
         assertEquals("Логин не может быть пустым", errorMessage1.get(0));
 
+    }
+
+    @Test
+    void shouldNotPassValidationIfLoginContainsSpaces() {
+        User user = getNewUser();
+
         user.setLogin("User Login");
 
-        violations = validator.validate(user);
-        List<String> errorMessage2 = violations.stream()
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        List<String> errorMessage = violations.stream()
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toList());
 
-        assertEquals("Логин не может содержать пробелы", errorMessage2.get(0));
+        assertEquals("Логин не может содержать пробелы", errorMessage.get(0));
         assertEquals(1, violations.size());
     }
 

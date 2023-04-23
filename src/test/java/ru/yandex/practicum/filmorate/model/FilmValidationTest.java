@@ -57,8 +57,6 @@ public class FilmValidationTest {
                 .collect(Collectors.toList());
 
         assertEquals(1, violations.size());
-        assertTrue(film.getDescription().length() > 200);
-        assertNotNull(validator.validate(film));
         assertEquals("Описание не должно быть больше 200 символов", errorMessage.get(0));
     }
 
@@ -77,8 +75,6 @@ public class FilmValidationTest {
                 .collect(Collectors.toList());
 
         assertEquals(1, violations.size());
-        assertTrue(filmIndustryStart.isAfter(film.getReleaseDate()));
-        assertNotNull(validator.validate(film));
         assertEquals("Дата не может быть раньше, чем 28.12.1985", errorMessage.get(0));
     }
 }
