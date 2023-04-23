@@ -1,14 +1,17 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.sun.tools.jconsole.JConsoleContext;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Validate;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
+import javax.validation.*;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FilmValidationTest {
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
@@ -36,7 +39,11 @@ public class FilmValidationTest {
         film.setName("");
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        List<String> errorMessage = violations.stream().
+                map(ConstraintViolation::getMessage).collect(Collectors.toList());
+
         assertEquals(1, violations.size());
+        assertEquals("Название не может быть пустым", errorMessage.get(0));
     }
 
     @Test
@@ -46,9 +53,13 @@ public class FilmValidationTest {
         film.setDescription("!".repeat(201));
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        List<String> errorMessage = violations.stream().
+                map(ConstraintViolation::getMessage).collect(Collectors.toList());
+
         assertEquals(1, violations.size());
         assertTrue(film.getDescription().length() > 200);
-
+        assertNotNull(validator.validate(film));
+        assertEquals("Описание не должно быть больше 200 символов", errorMessage.get(0));
     }
 
     @Test
@@ -60,8 +71,13 @@ public class FilmValidationTest {
         film.setReleaseDate(LocalDate.of(1895, 11, 28));
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
+
+        List<String> errorMessage = violations.stream().
+                map(ConstraintViolation::getMessage).collect(Collectors.toList());
+
         assertEquals(1, violations.size());
         assertTrue(filmIndustryStart.isAfter(film.getReleaseDate()));
-
+        assertNotNull(validator.validate(film));
+        assertEquals("Дата не может быть раньше, чем 28.12.1985", errorMessage.get(0));
     }
 }

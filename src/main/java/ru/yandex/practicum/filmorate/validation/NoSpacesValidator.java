@@ -7,6 +7,7 @@ public class NoSpacesValidator implements ConstraintValidator<NoSpace, String> {
 
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
+
         return !s.contains(" ");
     }
 }

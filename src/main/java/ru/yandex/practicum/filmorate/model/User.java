@@ -11,12 +11,12 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 public class User {
     private int id;
-    @Email
+    @Email(message = "Email должен быть корректный xxx@example.com")
     private String email;
-    @NotBlank
-    @NoSpace
+    @NotBlank(message = "Логин не может быть пустым")
+    @NoSpace(message = "Логин не может содержать пробелы")
     private String login;
     private String name;
-    @Past
+    @Past(message = "Дата рождения не может быть в будущем времени")
     private LocalDate birthday;
 }

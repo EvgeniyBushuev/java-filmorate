@@ -11,12 +11,12 @@ import java.time.LocalDate;
 @Data
 public class Film {
     private int id;
-    @NotBlank
+    @NotBlank(message = "Название не может быть пустым")
     private String name;
-    @Length(max = 200)
+    @Length(max = 200, message = "Описание не должно быть больше 200 символов")
     private String description;
-    @FilmRelease
+    @FilmRelease(message = "Дата не может быть раньше, чем 28.12.1985")
     private LocalDate releaseDate;
-    @Positive
+    @Positive(message = "Продолжительность фильма должна быть положительной")
     private Integer duration;
 }

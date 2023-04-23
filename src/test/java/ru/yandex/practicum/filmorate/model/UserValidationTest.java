@@ -6,7 +6,9 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -36,8 +38,11 @@ public class UserValidationTest {
         user.setEmail("wrongEmail.com");
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
-        assertEquals(1, violations.size());
+        List<String> errorMessage = violations.stream().
+                map(ConstraintViolation::getMessage).collect(Collectors.toList());
 
+        assertEquals(1, violations.size());
+        assertEquals("Email должен быть корректный xxx@example.com", errorMessage.get(0));
     }
 
     @Test
@@ -46,11 +51,19 @@ public class UserValidationTest {
         user.setLogin("");
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
+        List<String> errorMessage1 = violations.stream().
+                map(ConstraintViolation::getMessage).collect(Collectors.toList());
+
         assertEquals(1, violations.size());
+        assertEquals("Логин не может быть пустым", errorMessage1.get(0));
 
         user.setLogin("User Login");
 
         violations = validator.validate(user);
+        List<String> errorMessage2 = violations.stream().
+                map(ConstraintViolation::getMessage).collect(Collectors.toList());
+
+        assertEquals("Логин не может содержать пробелы", errorMessage2.get(0));
         assertEquals(1, violations.size());
     }
 
@@ -60,7 +73,11 @@ public class UserValidationTest {
         user.setBirthday(LocalDate.MAX);
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
+        List<String> errorMessage = violations.stream().
+                map(ConstraintViolation::getMessage).collect(Collectors.toList());
+
         assertEquals(1, violations.size());
+        assertEquals("Дата рождения не может быть в будущем времени", errorMessage.get(0));
     }
 
 }
