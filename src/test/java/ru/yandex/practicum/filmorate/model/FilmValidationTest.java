@@ -37,8 +37,8 @@ public class FilmValidationTest {
         film.setName("");
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        List<String> errorMessage = violations.stream().
-                map(ConstraintViolation::getMessage)
+        List<String> errorMessage = violations.stream()
+                .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toList());
 
         assertEquals(1, violations.size());
@@ -52,8 +52,8 @@ public class FilmValidationTest {
         film.setDescription("!".repeat(201));
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        List<String> errorMessage = violations.stream().
-                map(ConstraintViolation::getMessage)
+        List<String> errorMessage = violations.stream()
+                .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toList());
 
         assertEquals(1, violations.size());
@@ -72,8 +72,8 @@ public class FilmValidationTest {
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
 
-        List<String> errorMessage = violations.stream().
-                map(ConstraintViolation::getMessage)
+        List<String> errorMessage = violations.stream()
+                .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toList());
 
         assertEquals(1, violations.size());
