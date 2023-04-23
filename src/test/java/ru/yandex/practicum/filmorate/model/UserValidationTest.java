@@ -38,8 +38,9 @@ public class UserValidationTest {
         user.setEmail("wrongEmail.com");
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
-        List<String> errorMessage = violations.stream().
-                map(ConstraintViolation::getMessage).collect(Collectors.toList());
+        List<String> errorMessage = violations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toList());
 
         assertEquals(1, violations.size());
         assertEquals("Email должен быть корректный xxx@example.com", errorMessage.get(0));
@@ -51,8 +52,9 @@ public class UserValidationTest {
         user.setLogin("");
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
-        List<String> errorMessage1 = violations.stream().
-                map(ConstraintViolation::getMessage).collect(Collectors.toList());
+        List<String> errorMessage1 = violations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toList());
 
         assertEquals(1, violations.size());
         assertEquals("Логин не может быть пустым", errorMessage1.get(0));
@@ -60,8 +62,9 @@ public class UserValidationTest {
         user.setLogin("User Login");
 
         violations = validator.validate(user);
-        List<String> errorMessage2 = violations.stream().
-                map(ConstraintViolation::getMessage).collect(Collectors.toList());
+        List<String> errorMessage2 = violations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toList());
 
         assertEquals("Логин не может содержать пробелы", errorMessage2.get(0));
         assertEquals(1, violations.size());
@@ -73,8 +76,9 @@ public class UserValidationTest {
         user.setBirthday(LocalDate.MAX);
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
-        List<String> errorMessage = violations.stream().
-                map(ConstraintViolation::getMessage).collect(Collectors.toList());
+        List<String> errorMessage = violations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toList());
 
         assertEquals(1, violations.size());
         assertEquals("Дата рождения не может быть в будущем времени", errorMessage.get(0));
