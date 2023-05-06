@@ -62,7 +62,7 @@ public class UserService {
         User user1 = userStorage.get(id1);
         User user2 = userStorage.get(id2);
 
-        if(!user1.getFriends().contains(user2.getId())
+        if (!user1.getFriends().contains(user2.getId())
                 || !user2.getFriends().contains(user1.getId())) {
             log.debug("Попытка удалиться из друзей. Пользователи ID {} и {} не друзья", user1.getId(), user2.getId());
             throw new IncorrectIdException("Пользователи с ID " + user1.getId() + ", " + user2.getId() + " не друзья.");
