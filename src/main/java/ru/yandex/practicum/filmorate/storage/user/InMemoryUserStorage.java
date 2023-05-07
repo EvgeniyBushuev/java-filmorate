@@ -5,10 +5,8 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -21,46 +19,57 @@ public class InMemoryUserStorage implements UserStorage {
         id++;
         user.setId(id);
         users.put(user.getId(), user);
-        log.info("Добавлен пользователь ID {}", user.getId());
+        log.info("Добавлен новый пользователь ID {}", user.getId());
         return user;
     }
 
     @Override
     public long delete(long id) {
-        if (!users.containsKey(id)) {
-            log.warn("Удаление пользователя с несуществующим ID {}", id);
-            throw new IncorrectIdException("Использован не существующий ID");
-        }
 
-        log.debug("Удален пользователь ID: {}", id);
-        users.remove(id);
+        if (isUserExists(id)) {
+            log.debug("Удален пользователь ID: {}", id);
+            users.remove(id);
+        }
         return id;
     }
 
     @Override
     public User update(User user) {
-        if (!users.containsKey(user.getId())) {
-            log.warn("Обновление пользователя с несуществующим ID {}", user.getId());
-            throw new IncorrectIdException("Пользователь с ID: " + id + " не найден.");
-        }
 
-        users.put(user.getId(), user);
-        log.info("Обновлен пользователь ID {}", user.getId());
+        if (isUserExists(user.getId())) {
+            users.put(user.getId(), user);
+            log.info("Обновлен пользователь ID {}", user.getId());
+        }
         return user;
     }
 
     @Override
     public User get(long id) {
-        if (!users.containsKey(id)) {
-            log.warn("Получение пользователя с несуществующим ID {}", id);
-            throw new IncorrectIdException("Пользователь с ID: " + id + " не найден.");
-        }
 
-        return users.get(id);
+        if (isUserExists(id)) {
+            return users.get(id);
+        }
+        return null;
     }
 
     @Override
     public List<User> getAll() {
         return new ArrayList<>(users.values());
+    }
+
+    @Override
+    public boolean isUserExists(long id) {
+        if (!users.containsKey(id)) {
+            log.warn("Пользователь ID {}, не найден", id);
+            throw new IncorrectIdException("Пользователь с ID: " + id + " не найден.");
+        }
+        return true;
+    }
+
+    @Override
+    public List<User> getUserFriends(Set<Long> friendsId) {
+        return friendsId.stream()
+                .map(this::get)
+                .collect(Collectors.toList());
     }
 }

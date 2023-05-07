@@ -3,12 +3,11 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
+import ru.yandex.practicum.filmorate.exception.RemoveFriendException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -48,11 +47,12 @@ public class UserService {
     }
 
     public void addFriend(long id1, long id2) {
+
         User user1 = userStorage.get(id1);
         User user2 = userStorage.get(id2);
 
-        user1.getFriends().add(user2.getId());
-        user2.getFriends().add(user1.getId());
+        user1.getFriendsId().add(id2);
+        user2.getFriendsId().add(id1);
 
         log.info("Пользователи с ID {} и {} теперь друзья", user1.getId(), user2.getId());
     }
@@ -62,14 +62,15 @@ public class UserService {
         User user1 = userStorage.get(id1);
         User user2 = userStorage.get(id2);
 
-        if (!user1.getFriends().contains(user2.getId())
-                || !user2.getFriends().contains(user1.getId())) {
-            log.debug("Попытка удалиться из друзей. Пользователи ID {} и {} не друзья", user1.getId(), user2.getId());
-            throw new IncorrectIdException("Пользователи с ID " + user1.getId() + ", " + user2.getId() + " не друзья.");
+        if ((getUsers().stream().noneMatch(user -> user.getId() == id1))
+                || (getUsers().stream().noneMatch(user -> user.getId() == id2))) {
+            log.warn("Попытка удалиться из друзей. Пользователи ID {} и {} не друзья", user1.getId(), user2.getId());
+            throw new RemoveFriendException("Пользователи с ID " + user1.getId()
+                    + ", " + user2.getId() + " не друзья.");
         }
 
-        user1.getFriends().remove(id2);
-        user2.getFriends().remove(id1);
+        user1.getFriendsId().remove(id2);
+        user2.getFriendsId().remove(id1);
         log.info("Пользователи с ID {} и {} теперь не друзья", user1.getId(), user2.getId());
     }
 
@@ -77,9 +78,7 @@ public class UserService {
 
         List<User> friendsId1 = getFriends(id1);
 
-        List<User> friendsId2 = getFriends(id2);
-
-        friendsId1.retainAll(friendsId2);
+        friendsId1.retainAll(getFriends(id2));
 
         return friendsId1;
     }
@@ -87,9 +86,6 @@ public class UserService {
     public List<User> getFriends(long id) {
         User user = userStorage.get(id);
 
-        return user.getFriends()
-                .stream()
-                .map(userStorage::get)
-                .collect(Collectors.toList());
+        return userStorage.getUserFriends(user.getFriendsId());
     }
 }

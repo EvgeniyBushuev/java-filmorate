@@ -41,16 +41,20 @@ public class FilmService {
 
     public void addLike(long filmId, long userId) {
         Film film = filmStorage.get(filmId);
-        User user = userStorage.get(userId);
 
-        film.getLikes().add(user.getId());
+        if(userStorage.isUserExists(userId)) {
+            film.getLikes().add(userId);
+            log.debug("Пользователь ID: {}, поставил лайк фильму ID: {}", userId, filmId);
+        }
     }
 
     public void removeLike(long filmId, long userId) {
         Film film = filmStorage.get(filmId);
-        User user = userStorage.get(userId);
 
-        film.getLikes().remove(user.getId());
+        if(userStorage.isUserExists(userId)) {
+            film.getLikes().remove(userId);
+            log.debug("Пользователь ID: {}, удалил лайк фильму ID: {}", userId, filmId);
+        }
     }
 
     public List<Film> getTopFilms(long count) {
