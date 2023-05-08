@@ -24,13 +24,14 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public long delete(long id) {
+    public void delete(long id) {
 
         if (isUserExists(id)) {
             log.debug("Удален пользователь ID: {}", id);
             users.remove(id);
+        } else {
+            throw new IncorrectIdException("Пользоваетль ID: " + id + " не найден");
         }
-        return id;
     }
 
     @Override
@@ -39,8 +40,10 @@ public class InMemoryUserStorage implements UserStorage {
         if (isUserExists(user.getId())) {
             users.put(user.getId(), user);
             log.info("Обновлен пользователь ID {}", user.getId());
+            return user;
+        } else {
+            throw new IncorrectIdException("Пользоваетль ID: " + id + " не найден");
         }
-        return user;
     }
 
     @Override
@@ -48,8 +51,9 @@ public class InMemoryUserStorage implements UserStorage {
 
         if (isUserExists(id)) {
             return users.get(id);
+        } else {
+            throw new IncorrectIdException("Пользоваетль ID: " + id + " не найден");
         }
-        return null;
     }
 
     @Override
@@ -59,11 +63,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public boolean isUserExists(long id) {
-        if (!users.containsKey(id)) {
-            log.warn("Пользователь ID {}, не найден", id);
-            throw new IncorrectIdException("Пользователь с ID: " + id + " не найден.");
-        }
-        return true;
+        return users.containsKey(id);
     }
 
     @Override

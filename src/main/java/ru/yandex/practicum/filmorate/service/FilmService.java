@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -53,6 +54,8 @@ public class FilmService {
         if (userStorage.isUserExists(userId)) {
             film.getLikes().remove(userId);
             log.debug("Пользователь ID: {}, удалил лайк фильму ID: {}", userId, filmId);
+        } else {
+            throw new IncorrectIdException("Пользоваетль ID: " + userId + " не найден");
         }
     }
 

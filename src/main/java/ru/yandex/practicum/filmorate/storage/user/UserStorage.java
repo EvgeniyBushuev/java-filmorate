@@ -8,7 +8,7 @@ public interface UserStorage {
 
     User add(User user);
 
-    long delete(long id);
+    void delete(long id);
 
     User update(User user);
 
