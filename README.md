@@ -35,3 +35,18 @@ Genre - Varchar(50), ENUM <br>
 ID - **PK**, Smallint, NotNull <br>
 Rating - Varchar(50), ENUM <br>
 
+#### UserFriendship
+From User ID - **PK1**, составной ключ, инициатор запроса <br>
+To User ID - **PK2**, составной ключ <br>
+Status ID - **FK**, статус запроса (wait \ friend) <br>
+
+### Film_Genre
+Film ID - **PK** <br>
+Genre ID - **FK** <br>
+
+### User_Film_Likes
+User ID - **PK1**, составной ключ <br>
+Film ID - **PK2**, составной ключ <br>
+
+
+
