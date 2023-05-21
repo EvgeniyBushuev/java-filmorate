@@ -12,7 +12,7 @@ Name - Varchar(50) <br>
 Birthday - Date <br>
 
 ### Status - взимоотношение двух пользователей <br>
-*Status - в значении заявки на дружбу с другим пользователем (request \ friend) <br>
+*Status - в значении заявки на дружбу с другим пользователем <br>
 
 ID - **PK**, Smallint, NotNull <br>
 Status - Varchar(50) <br>
@@ -38,7 +38,7 @@ Rating - Varchar(50), ENUM <br>
 ### UserFriendship - взаимоотношение пользователей в формате заявки на добавление в друзья
 From User ID - **PK1**, составной ключ, инициатор запроса <br>
 To User ID - **PK2**, составной ключ <br>
-Status ID - **FK**, статус запроса (wait \ friend) <br>
+Status - Boolean, статус запроса (false \ true) <br>
 
 ### Film_Genre - соотношение фильма и его жанра/ов
 Film ID - **PK** <br>
@@ -47,6 +47,8 @@ Genre ID - **FK** <br>
 ### User_Film_Likes - соотношение лайков от пользователей к фильмам
 User ID - **PK1**, составной ключ <br>
 Film ID - **PK2**, составной ключ <br>
+
+
 
 
 
