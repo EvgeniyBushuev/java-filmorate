@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.friends;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -13,26 +14,27 @@ public class FriendsDbStorage implements FriendsStorage {
 
     @Override
     public void addToFriends(long userId, long friendId) {
-        String q = "INSERT INTO USERS_FRIENDSHIP (USER_FROM, USER_TO) VALUES (?, ?)";
-        jdbcTemplate.update(q, userId, friendId);
+        String sql = "INSERT INTO FRIENDSHIP (FROM_USER, TO_USER) VALUES (?, ?)";
+        jdbcTemplate.update(sql, userId, friendId);
     }
 
     @Override
     public void deleteFromFriends(long userId, long friendId) {
-        String q = "DELETE FROM USERS_FRIENDSHIP WHERE USER_FROM = ? AND USER_TO = ?";
-        jdbcTemplate.update(q, userId, friendId);
+        String sql = "DELETE FROM FRIENDSHIP WHERE FROM_USER = ? AND TO_USER = ?";
+        jdbcTemplate.update(sql, userId, friendId);
     }
+
 
     @Override
     public Collection<Long> getFriendsIds(long userId) {
-        String q = "SELECT USER_TO FROM USERS_FRIENDSHIP WHERE USER_FROM = ?";
-        return jdbcTemplate.queryForList(q, Long.class, userId);
+        String sql = "SELECT TO_USER FROM FRIENDSHIP WHERE FROM_USER = ?";
+        return jdbcTemplate.queryForList(sql, Long.class, userId);
     }
 
     @Override
     public Collection<Long> getCommonFriendsIds(long userId, long friendId) {
-        String q = "SELECT USER_TO FROM USERS_FRIENDSHIP WHERE USER_FROM = ? AND USER_TO IN " +
-                "(SELECT USER_TO FROM USERS_FRIENDSHIP WHERE USER_FROM = ?)";
-        return jdbcTemplate.queryForList(q, Long.class, userId, friendId);
+        String sql = "SELECT TO_USER FROM FRIENDSHIP WHERE FROM_USER = ? AND TO_USER IN " +
+                "(SELECT TO_USER FROM FRIENDSHIP WHERE FROM_USER = ?)";
+        return jdbcTemplate.queryForList(sql, Long.class, userId, friendId);
     }
 }
