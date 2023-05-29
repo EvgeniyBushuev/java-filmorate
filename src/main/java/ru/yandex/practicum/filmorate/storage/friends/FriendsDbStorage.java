@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.friends;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
