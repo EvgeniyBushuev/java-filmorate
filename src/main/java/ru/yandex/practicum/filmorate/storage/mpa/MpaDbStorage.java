@@ -19,6 +19,7 @@ import java.util.List;
 public class MpaDbStorage implements MpaStorage {
 
     private final JdbcTemplate jdbcTemplate;
+
     @Override
     public List<Mpa> getALL() {
         String sql = "SELECT MPA_ID, MPA_NAME" +
