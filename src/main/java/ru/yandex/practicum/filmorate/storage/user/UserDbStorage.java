@@ -91,7 +91,7 @@ public class UserDbStorage implements UserStorage {
                 "BIRTHDAY " +
                 "FROM USERS WHERE USER_ID = ?";
 
-        if (isUserExists(id)){
+        if (isUserExists(id)) {
             return jdbcTemplate.queryForObject(sql, new UserMapper(), id);
         } else {
             log.debug("Некоректный идентификатор пользователя в запросе");
@@ -111,7 +111,7 @@ public class UserDbStorage implements UserStorage {
         String sql = "SELECT COUNT (USER_ID) FROM USERS WHERE USER_ID = ?";
         Long count = jdbcTemplate.queryForObject(sql, Long.class, id);
 
-        if (count == 1 ) {
+        if (count == 1) {
             return true;
         } else {
             return false;
