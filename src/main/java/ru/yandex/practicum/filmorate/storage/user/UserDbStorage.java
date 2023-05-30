@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -62,9 +61,9 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User update(User user) {
-        try {
+        if (isUserExists(user.getId())) {
             jdbcTemplate.queryForObject("SELECT USER_ID FROM USERS WHERE USER_ID = ?", Long.class, user.getId());
-        } catch (EmptyResultDataAccessException e) {
+        } else {
             log.error("Некоректный идентификатор пользователя. ID в запросе {}", user.getId());
             throw new IncorrectIdException("Некоректный идентификатор пользователя. ID в запросе " + user.getId());
         }
@@ -92,9 +91,9 @@ public class UserDbStorage implements UserStorage {
                 "BIRTHDAY " +
                 "FROM USERS WHERE USER_ID = ?";
 
-        try {
+        if (isUserExists(id)){
             return jdbcTemplate.queryForObject(sql, new UserMapper(), id);
-        } catch (EmptyResultDataAccessException e) {
+        } else {
             log.debug("Некоректный идентификатор пользователя в запросе");
             throw new IncorrectIdException("Некорректный идентификатор пользователя в запросе. ID запроса = " + id);
         }
@@ -108,10 +107,13 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public boolean isUserExists(long id) {
-        try {
-            get(id);
+
+        String sql = "SELECT COUNT (USER_ID) FROM USERS WHERE USER_ID = ?";
+        Long count = jdbcTemplate.queryForObject(sql, Long.class, id);
+
+        if (count == 1 ) {
             return true;
-        } catch (IncorrectIdException exception) {
+        } else {
             return false;
         }
     }

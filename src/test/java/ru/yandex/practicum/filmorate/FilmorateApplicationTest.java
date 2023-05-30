@@ -9,10 +9,12 @@ import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.friends.FriendsDbStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.time.LocalDate;
+import java.util.Collection;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -25,6 +27,7 @@ class FilmorateApplicationTest {
     private final UserDbStorage userStorage;
     private final FilmDbStorage filmStorage;
     private final MpaDbStorage mpaStorage;
+    private final FriendsDbStorage friendsStorage;
 
     @Test
     public void shouldReturnUserById1() {
@@ -93,4 +96,14 @@ class FilmorateApplicationTest {
 
         assertThat(filmStorage.get(1)).hasFieldOrPropertyWithValue("description", "Новое описание фильма4");
     }
+
+    @Test
+    public void shouldAddFriend() {
+
+        friendsStorage.addToFriends(1,2);
+
+        assertThat(friendsStorage.getFriendsIds(1)).asList().hasSize(1);
+
+    }
+
 }

@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.genre;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -12,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -28,13 +28,15 @@ public class GenreDbStorage implements GenreStorage {
     @Override
     public Genre get(long id) {
         String sql = "SELECT GENRE_ID, GENRE_NAME FROM GENRES WHERE GENRE_ID = ?";
-        try {
-            return jdbcTemplate.queryForObject(sql, new GenreMapper(), id);
-        } catch (EmptyResultDataAccessException e) {
+
+        List<Genre>genre = jdbcTemplate.query(sql, new GenreMapper(), id);
+
+        if (!genre.isEmpty()) {
+            return genre.get(0);
+        } else {
             log.debug("Некореткный идентификатор жанра. ID в запросе {}", id);
             throw new IncorrectIdException("Некореткный идентификатор жанра. ID в запросе " + id);
         }
-
     }
 
     private static class GenreMapper implements RowMapper<Genre> {

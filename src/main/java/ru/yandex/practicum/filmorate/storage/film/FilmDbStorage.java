@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -16,9 +16,11 @@ import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.likes.LikesStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -64,37 +66,40 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
-        try {
-            String sql = "SELECT FILM_ID FROM FILM WHERE FILM_ID = ?";
-            jdbcTemplate.queryForObject(sql, Long.class, film.getId());
-        } catch (EmptyResultDataAccessException e) {
+
+        String sql = "SELECT COUNT (FILM_ID) FROM FILM WHERE FILM_ID = ?";
+        Long count = jdbcTemplate.queryForObject(sql, Long.class, film.getId());
+
+        if (count == 1) {
+            String update = "UPDATE FILM SET FILM_NAME = ?, " +
+                    "FILM_DESCRIPTION = ?, FILM_RELEASE = ?, FILM_DURATION = ?, MPA_ID = ? WHERE FILM_ID = ?";
+
+            jdbcTemplate.update(update,
+                    film.getName(),
+                    film.getDescription(),
+                    film.getReleaseDate(),
+                    film.getDuration(),
+                    film.getMpa().getId(),
+                    film.getId());
+
+            updateGenresFilmTable(film);
+            return film;
+        } else {
             log.debug("Некоретный идентификатор фильма. ID запроса {}", film.getId());
             throw new IncorrectIdException("Некоретный идентификатор фильма. ID запроса " + film.getId());
         }
-
-        String sql = "UPDATE FILM SET FILM_NAME = ?, " +
-                "FILM_DESCRIPTION = ?, FILM_RELEASE = ?, FILM_DURATION = ?, MPA_ID = ? WHERE FILM_ID = ?";
-
-        jdbcTemplate.update(sql,
-                film.getName(),
-                film.getDescription(),
-                film.getReleaseDate(),
-                film.getDuration(),
-                film.getMpa().getId(),
-                film.getId());
-
-        updateGenresFilmTable(film);
-
-        return film;
     }
 
     @Override
     public Film get(long id) {
         String sql = "SELECT FILM_ID, FILM_NAME, FILM_DESCRIPTION, FILM_RELEASE, FILM_DURATION, MPA_ID" +
                 " FROM FILM WHERE FILM_ID = ?";
-        try {
-            return jdbcTemplate.queryForObject(sql, new FilmMapper(), id);
-        } catch (EmptyResultDataAccessException e) {
+
+        List<Film> film = jdbcTemplate.query(sql, new FilmMapper(), id);
+
+        if (!film.isEmpty()) {
+            return film.get(0);
+        } else {
             log.debug("Некоректный идентификатор фильма. ID в запросе {}.", id);
             throw new IncorrectIdException("Некоректный идентификатор фильма. ID в запросе {}. " + id);
         }
@@ -137,9 +142,20 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "DELETE FROM FILM_GENRE WHERE FILM_ID = ?";
         jdbcTemplate.update(sql, film.getId());
 
-        String insert = "INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)";
-        for (Genre genre : film.getGenres()) {
-            jdbcTemplate.update(insert, film.getId(), genre.getId());
-        }
+        String insert = "INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (? , ?)";
+
+        List<Long> genres = film.getGenres().stream().map(Genre::getId).collect(Collectors.toList());
+        jdbcTemplate.batchUpdate(insert, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setLong(1, film.getId());
+                ps.setLong(2, genres.get(i));
+            }
+
+            @Override
+            public int getBatchSize() {
+                return genres.size();
+            }
+        });
     }
 }
