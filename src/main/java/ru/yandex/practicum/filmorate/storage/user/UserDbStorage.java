@@ -12,13 +12,8 @@ import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.friends.FriendsStorage;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.sql.*;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -121,7 +116,14 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getUserFriends(Set<Long> friendsId) {
 
-        return friendsId.stream().map(this::get).collect(Collectors.toList());
+        String inSql = String.join(",", Collections.nCopies(friendsId.size(), "?"));
+
+        List<User> users = jdbcTemplate.query(
+                String.format("SELECT * FROM USERS WHERE USER_ID IN (%s)", inSql),
+                new UserMapper(),
+                friendsId.toArray());
+
+        return  users;
     }
 
     private class UserMapper implements RowMapper<User> {
