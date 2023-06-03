@@ -2,19 +2,29 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.exception.RemoveFriendException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.friends.FriendsStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
+    @Qualifier("userDbStorage")
     private final UserStorage userStorage;
+
+    @Qualifier("friendsDbStorage")
+    private final FriendsStorage friendsStorage;
 
     public List<User> getUsers() {
         return userStorage.getAll();
@@ -47,45 +57,38 @@ public class UserService {
     }
 
     public void addFriend(long id1, long id2) {
-
-        User user1 = userStorage.get(id1);
-        User user2 = userStorage.get(id2);
-
-        user1.getFriendsId().add(id2);
-        user2.getFriendsId().add(id1);
-
-        log.info("Пользователи с ID {} и {} теперь друзья", user1.getId(), user2.getId());
+        if ((getUsers().stream().noneMatch(user -> user.getId() == id2))) {
+            log.debug("Пользователь ID {}, не найден", id2);
+            throw new IncorrectIdException("Пользователь с ID " + id2);
+        }
+        friendsStorage.addToFriends(id1, id2);
+        log.info("Пользователи с ID {} и {} теперь друзья", id1, id2);
     }
 
     public void deleteFriend(long id1, long id2) {
 
-        User user1 = userStorage.get(id1);
-        User user2 = userStorage.get(id2);
-
         if ((getUsers().stream().noneMatch(user -> user.getId() == id1))
                 || (getUsers().stream().noneMatch(user -> user.getId() == id2))) {
-            log.warn("Попытка удалиться из друзей. Пользователи ID {} и {} не друзья", user1.getId(), user2.getId());
-            throw new RemoveFriendException("Пользователи с ID " + user1.getId()
-                    + ", " + user2.getId() + " не друзья.");
+            log.warn("Попытка удалиться из друзей. Пользователи ID {} и {} не друзья", id1, id2);
+            throw new RemoveFriendException("Пользователи с ID " + id1
+                    + ", " + id2 + " не друзья.");
         }
 
-        user1.getFriendsId().remove(id2);
-        user2.getFriendsId().remove(id1);
-        log.info("Пользователи с ID {} и {} теперь не друзья", user1.getId(), user2.getId());
+        friendsStorage.deleteFromFriends(id1, id2);
+        log.info("Пользователи с ID {} и {} теперь не друзья", id1, id2);
     }
 
     public List<User> getCommonFriends(long id1, long id2) {
 
-        List<User> friendsId1 = getFriends(id1);
-
-        friendsId1.retainAll(getFriends(id2));
-
-        return friendsId1;
+        return friendsStorage.getCommonFriendsIds(id1, id2)
+                .stream()
+                .map(userStorage::get)
+                .collect(Collectors.toList());
     }
 
     public List<User> getFriends(long id) {
-        User user = userStorage.get(id);
+        Set<Long> friendsId = new TreeSet<>(friendsStorage.getFriendsIds(id));
 
-        return userStorage.getUserFriends(user.getFriendsId());
+        return userStorage.getUserFriends(friendsId);
     }
 }
